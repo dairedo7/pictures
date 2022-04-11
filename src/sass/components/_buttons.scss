@@ -1,0 +1,29 @@
+.load-more-btn {
+  width: 250px;
+  padding: 12px 20px;
+  margin: 0 auto;
+  border-radius: 25px;
+  border: 1px solid rgb(11, 218, 218);
+  font-family: Open Sans;
+  font-style: normal;
+  font-weight: 600;
+  font-size: 12px;
+  line-height: 1.33;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+
+  color: black;
+  background: azure;
+  cursor: pointer;
+
+  transition: background-color cubic-bezier(0.4, 0, 0.2, 1) 250ms;
+
+  &:hover,
+  &:focus {
+    color: white;
+    border: none;
+    background-color: rgb(11, 218, 218);
+    box-shadow: -4px 0px 8px rgba(0, 0, 0, 0.04),
+      -2px 0px 4px rgba(0, 0, 0, 0.08), -1px 0px 3px rgba(0, 0, 0, 0.16);
+  }
+}
