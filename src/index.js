@@ -1,5 +1,4 @@
 import './sass/main.scss';
-import * as APIService from './js/API/pictures'
 import { getRefs } from './js/getRefs'
 import { getPics } from './js/API/pictures'
 
@@ -21,17 +20,15 @@ const loadMoreBtn = new LoadMoreBtn({
 const btn = document.querySelector('.load-more-btn');
 btn.addEventListener('click', loadPictures)
 
+const widget = document.querySelector('.widget');
+console.log(widget)
+
 let page = 1;
 let limit = 10;
 let total = 100;
 let totalPosts = total / limit;
 
 loadMoreBtn.hide();
-
-// const loadBtn = document.getElementById('load-btn');
-// loadMoreBtn.addEventListener('click', loadPictures());
-
-// loadMoreBtn.classList.add('is-hidden');
 
 loadPictures()
   .then(() => {
@@ -42,21 +39,11 @@ loadPictures()
   })
   .catch(error => console.error(error));
 
-// function loadPictures() {
-//   return APIService.getPics().then(data => {
-//     renderPictures(data.pictures, commentsContainer);
-
-//     if (!data.hasNextPage) {
-//       loadMoreBtn.classList.add('is-hidden');
-//       showNotify('error', 'The end of search results');
-//     }
-//   });
-// }
 
 async function loadPictures() {
     try {
         const data = await getPics();
-        console.log(data)
+        // console.log(data)
         renderPictures(data, commentsContainer)
 
         if (page <= totalPosts) {
@@ -67,4 +54,39 @@ async function loadPictures() {
         console.log(error);
     }
     page++;
+}
+
+
+import { getWeather } from './js/API/weather'
+import { refs } from './js/helpers/weatherRefs'
+const widgetList = document.querySelector('.widget-list');
+
+const weatherItems = refs();
+
+if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition((position) => {
+        let lat = position.coords.latitude;
+        let long = position.coords.longitude;
+
+        loadWeather(lat, long)
+    })
+}
+async function loadWeather(lat, long) {
+
+  const response = await getWeather(lat, long);
+  console.log(response.weather[0].description);
+  const { main, weather, name } = response;
+  
+  return renderMarkup(response);
+}
+
+function renderMarkup({ main, weather, name }) {
+  const { temperature, weatherState, city, icon } = weatherItems;
+
+  temperature.textContent += main.temp;
+  weatherState.textContent += weather[0].description;
+  city.textContent += name;
+
+  const iconLink = `http://openweathermap.org/img/wn/${weather[0].icon}.png`;
+  icon.setAttribute('src', iconLink);
 }
