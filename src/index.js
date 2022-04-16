@@ -1,11 +1,16 @@
 import './sass/main.scss';
 import { getRefs } from './js/getRefs'
 import { getPics } from './js/API/pictures'
-
 import { renderPictures } from './js/renderComments'
 import { LoadMoreBtn } from './js/LoadMoreBtn'
 import { showNotify } from './js/showNotify';
-// import { picturesTemplate } from './templates/renderPics.hbs'
+import { Notify } from 'notiflix';
+import { getWeather } from './js/API/weather'
+import { renderWeather } from './js/renderWeather'
+import SimpleLightbox from 'simplelightbox';
+import 'simplelightbox/dist/simple-lightbox.css';
+const lightbox = new SimpleLightbox('.gallery a', { captionsData: 'alt', captionDelay: 250, captionPosition: 'bottom' });
+
 
 const { commentsContainer } = getRefs();
 const loadMoreBtn = new LoadMoreBtn({
@@ -33,6 +38,7 @@ loadMoreBtn.hide();
 loadPictures()
   .then(() => {
     loadMoreBtn.show();
+    lightbox.refresh();
     showNotify('success', 'Comments have been loaded');
     page++;
     // loadMoreBtn.classList.remove('is-hidden');
@@ -41,11 +47,12 @@ loadPictures()
 
 
 async function loadPictures() {
-    try {
+  try {
+        
         const data = await getPics();
         // console.log(data)
         renderPictures(data, commentsContainer)
-
+        lightbox.refresh();
         if (page <= totalPosts) {
           loadMoreBtn.hide();
         }
@@ -56,37 +63,23 @@ async function loadPictures() {
     page++;
 }
 
-
-import { getWeather } from './js/API/weather'
-import { refs } from './js/helpers/weatherRefs'
-const widgetList = document.querySelector('.widget-list');
-
-const weatherItems = refs();
-
 if (navigator.geolocation) {
     navigator.geolocation.getCurrentPosition((position) => {
         let lat = position.coords.latitude;
         let long = position.coords.longitude;
-
         loadWeather(lat, long)
     })
 }
-async function loadWeather(lat, long) {
 
+async function loadWeather(lat, long) {
   const response = await getWeather(lat, long);
-  console.log(response.weather[0].description);
-  const { main, weather, name } = response;
-  
-  return renderMarkup(response);
+  const render = renderWeather(response);
+  console.log(response)
+  notifyWeather(response);
 }
 
-function renderMarkup({ main, weather, name }) {
-  const { temperature, weatherState, city, icon } = weatherItems;
-
-  temperature.textContent += main.temp;
-  weatherState.textContent += weather[0].description;
-  city.textContent += name;
-
-  const iconLink = `http://openweathermap.org/img/wn/${weather[0].icon}.png`;
-  icon.setAttribute('src', iconLink);
+async function notifyWeather(data) {
+  if (data.main !== '' || data.weather.length > 0 || data.name !== '') {
+      Notify.success(`Weather has been updated`)
+  }
 }

@@ -1,6 +1,6 @@
 export function getRefs() {
     return {
         loadMoreBtn: document.querySelector('.load-more-btn'),
-        commentsContainer: document.querySelector('.comments-container')
+        commentsContainer: document.querySelector('.comments-list')
     }
 }
